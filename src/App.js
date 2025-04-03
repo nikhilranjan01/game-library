@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Container, Row, Col, Navbar, Form, FormControl, Button, Card, Dropdown, Pagination } from "react-bootstrap";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import GameDetail from "./GameDetail";
+
 
 // Sidebar Filters Component
 const SidebarFilters = ({ setCategory, setTag }) => {
@@ -11,111 +14,117 @@ const SidebarFilters = ({ setCategory, setTag }) => {
 
   const handleCategoryChange = (selectedCategory) => {
     setCategoryState(selectedCategory);
-    setCategory(selectedCategory);  // Update parent state
+    setCategory(selectedCategory);
   };
 
   const handleTagChange = (selectedTag) => {
-    let formattedTag = selectedTag.toLowerCase().replace(" ", "-"); 
-  
-    // Manually handle known exceptions
+    let formattedTag = selectedTag.toLowerCase().replace(" ", "-");
+
     if (selectedTag === "Single-player") {
-      formattedTag = "singleplayer"; // Try this if "single-player" isn't working
+      formattedTag = "singleplayer";
     }
-  
+
     setTagState(selectedTag);
     setTag(formattedTag);
   };
-  
 
   return (
-    <div className="filters">
-      <h5>Filters</h5>
-
+    <div className="filters p-3 rounded shadow-sm bg-white">
+      <h5 className="fw-bold text-center mb-3">🎯 Filters</h5>
+  
       {/* Category Filter */}
-      <div>
-        <h6>Category</h6>
+      <div className="mb-3">
+        <h6 className="fw-semibold">📌 Category</h6>
         <Dropdown>
-          <Dropdown.Toggle variant="success" id="category-dropdown">
+          <Dropdown.Toggle variant="dark" className="w-100">
             {category}
           </Dropdown.Toggle>
-          <Dropdown.Menu>
+          <Dropdown.Menu className="w-100">
             <Dropdown.Item onClick={() => handleCategoryChange("Action")}>Action</Dropdown.Item>
             <Dropdown.Item onClick={() => handleCategoryChange("RPG")}>RPG</Dropdown.Item>
             <Dropdown.Item onClick={() => handleCategoryChange("Sports")}>Sports</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>
-
+  
       {/* Tags Filter */}
       <div>
-        <h6>Tags</h6>
+        <h6 className="fw-semibold">🏷️ Tags</h6>
         <Dropdown>
-          <Dropdown.Toggle variant="success" id="tag-dropdown">
+          <Dropdown.Toggle variant="dark" className="w-100">
             {tag}
           </Dropdown.Toggle>
-          <Dropdown.Menu>
+          <Dropdown.Menu className="w-100">
             <Dropdown.Item onClick={() => handleTagChange("Multiplayer")}>Multiplayer</Dropdown.Item>
             <Dropdown.Item onClick={() => handleTagChange("Single-player")}>Single-player</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>
     </div>
-  );
+  );  
 };
 
-const App = () => {
-  // State for category, tag, search, and game data
+
+// end sidebar
+
+
+
+const Home = () => {
+  return <AppContent />;
+};
+const Library = () => {
+};
+
+
+const AppContent = () => {
   const [category, setCategory] = useState("All");
   const [tag, setTag] = useState("All");
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch games based on category, tag, search query, and current page
   useEffect(() => {
     const fetchGames = async () => {
       setLoading(true);
       try {
-        const apiKey = "0ba9da439f9d4e3da77393547288154b"; // Replace with your API key
+        const apiKey = "0ba9da439f9d4e3da77393547288154b";
         const categoryQuery = category !== "All" ? `&category=${category}` : "";
         const tagQuery = tag !== "All" ? `&tags=${tag}` : "";
-        const searchQueryParam = searchQuery ? `&search=${searchQuery}` : ""; // Add search query parameter
+        const searchQueryParam = searchQuery ? `&search=${searchQuery}` : "";
         const pageQuery = `&page=${currentPage}`;
-
+    
+        // ✅ Fetch exactly 21 games per page
         const response = await axios.get(
-          `https://api.rawg.io/api/games?key=${apiKey}${categoryQuery}${tagQuery}${searchQueryParam}${pageQuery}`
+          `https://api.rawg.io/api/games?key=${apiKey}${categoryQuery}${tagQuery}${searchQueryParam}${pageQuery}&page_size=21`
         );
-        
-        setGames(response.data.results); // Save the fetched games data
-        setTotalPages(Math.ceil(response.data.count / 20)); // Assuming 20 results per page
+    
+        setGames(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / 21)); // Ensure pagination works correctly
       } catch (error) {
         console.error("Error fetching games:", error);
       }
       setLoading(false);
     };
+    
 
     fetchGames();
-  }, [category, tag, searchQuery, currentPage]); // Re-run the effect when category, tag, searchQuery, or page changes
+  }, [category, tag, searchQuery, currentPage]);
 
-  // Handle page change
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  // Handle search input change
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value); // Update search query state
+    setSearchQuery(e.target.value);
   };
 
-  // Handle search submit
   const handleSearchSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
-    setCurrentPage(1); // Reset to the first page when a new search is done
+    e.preventDefault();
+    setCurrentPage(1);
   };
 
-  // Generate page numbers (1-10 or adjusted to show 10 pages max)
   const generatePaginationItems = () => {
     const pageStart = Math.floor((currentPage - 1) / 19) * 19 + 1;
     const pageEnd = Math.min(pageStart + 18, totalPages);
@@ -123,11 +132,7 @@ const App = () => {
     let pages = [];
     for (let i = pageStart; i <= pageEnd; i++) {
       pages.push(
-        <Pagination.Item
-          key={i}
-          active={i === currentPage}
-          onClick={() => handlePageChange(i)}
-        >
+        <Pagination.Item key={i} active={i === currentPage} onClick={() => handlePageChange(i)}>
           {i}
         </Pagination.Item>
       );
@@ -138,68 +143,96 @@ const App = () => {
 
   return (
     <>
-      {/* Header */}
-      <Navbar bg="dark" variant="dark" expand="lg" className="px-3">
-        <Navbar.Brand href="#">Game Library</Navbar.Brand>
-        <Form className="d-flex ms-auto" onSubmit={handleSearchSubmit}>
-          <FormControl
-            type="search"
-            placeholder="Search Games"
-            className="me-2"
-            value={searchQuery}
-            onChange={handleSearchChange} // Update search query on input change
-          />
-          <Button variant="outline-light" type="submit">Search</Button>
-        </Form>
-        <Button variant="primary" className="ms-3">Library</Button>
-      </Navbar>
+        <Navbar bg="dark" variant="dark" expand="lg" className="px-3">
+          <Navbar.Brand as={Link} to="/">Game Library</Navbar.Brand>
+          <Form className="d-flex ms-auto" onSubmit={handleSearchSubmit}>
+            <FormControl type="search" placeholder="Search Games" className="me-2" value={searchQuery} onChange={handleSearchChange} />
+            <Button variant="outline-light" type="submit">Search</Button>
+          </Form>
+        </Navbar>
 
-      {/* Main Layout */}
-      <Container fluid className="mt-3">
+
+      <Container fluid className="mt-3">                      
         <Row>
           {/* Sidebar */}
           <Col md={3} className="bg-light p-3">
             <SidebarFilters setCategory={setCategory} setTag={setTag} />
           </Col>
 
-          {/* Game Cards Grid */}
+          {/* Game Cards Section */}
           <Col md={9}>
-            <Row>
-              {loading ? (
-                <p>Loading...</p> // Display loading text while fetching data
-              ) : (
-                games.map((game) => (
-                  <Col md={4} key={game.id} className="mb-3">
-                    <Card>
-                      <Card.Img variant="top" src={game.background_image} alt={game.name} />
-                      <Card.Body>
-                        <Card.Title>{game.name}</Card.Title>
-                        <Card.Text>
-                          Category: {category} | Tag: {tag} | Rating: ⭐ {game.rating}
-                        </Card.Text>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))
-              )}
-            </Row>
+            <div className="d-flex flex-column">
+              <Row className="g-4">
+                {loading ? (
+                  <div className="d-flex justify-content-center align-items-center w-100" style={{ height: "50vh" }}>
+                    <p className="text-muted fs-5">Loading games...</p>
+                  </div>
+                ) : (
+                  games.map((game) => (
+                    <Col md={4} key={game.id} className="d-flex">
+                      <Card className="game-card shadow-lg border-0 rounded-4">
+                        {/* Image */}
+                        <Card.Img
+                          variant="top"
+                          src={game.background_image}
+                          alt={game.name}
+                          className="rounded-top-4 game-image"
+                        />
 
-            {/* Pagination */}
-            <Pagination>
-              <Pagination.Prev
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              />
-              {generatePaginationItems()}
-              <Pagination.Next
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              />
-            </Pagination>
+                        {/* Card Body */}
+                        <Card.Body className="d-flex flex-column justify-content-between text-center">
+                          <div>
+                            <Card.Title className="fw-bold fs-5">{game.name}</Card.Title>
+                            <Card.Text className="text-muted small">
+                              <strong>📌 Category:</strong> {category} <br />
+                              <strong>🏷️ Tag:</strong> {tag} <br />
+                              <strong>⭐ Rating:</strong> {game.rating}
+                            </Card.Text>
+                          </div>
+                          <Link to={`/library/${game.id}`} className="btn btn-dark rounded-pill w-100 mt-2">
+                            🎮 View Details
+                          </Link>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))
+                )}
+              </Row>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <Pagination>
+                    <Pagination.Prev
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    />
+                    {generatePaginationItems()}
+                    <Pagination.Next
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    />
+                  </Pagination>
+                </div>
+              )}
+            </div>
           </Col>
         </Row>
       </Container>
+
     </>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/library" element={<Library />} />
+        <Route path="/library/:id" element={<GameDetail/>} />
+      </Routes>
+    </Router>
   );
 };
 
