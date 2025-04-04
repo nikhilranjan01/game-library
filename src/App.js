@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
-import { ClerkProvider, SignedIn, SignedOut, SignIn, SignUp, UserButton, RedirectToSignIn, useUser } from "@clerk/clerk-react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { ClerkProvider, SignedIn, SignedOut, SignIn,useClerk,SignUp, UserButton, useUser } from "@clerk/clerk-react";
 import { Container, Row, Col, Navbar, Form, FormControl, Button, Card, Dropdown, Pagination } from "react-bootstrap";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -76,22 +76,21 @@ const SidebarFilters = ({ setCategory, setTag }) => {
 const Home = () => {
   return <AppContent />;
 };
-// const Library = () => {
-//   const { isSignedIn } = useUser();
-//   if (!isSignedIn) return <RedirectToSignIn />;
-//       return <GameDetail/>
-//   // return (
-//   //   <div className="p-5 text-center">
-//   //     <h2>📚 Welcome to Your Game Library!</h2>
-//   //     <p>This is a protected page only for signed-in users.</p>
-//   //   </div>
-//   // );
-// };
+
+const SignInPage = () => {
+  return (
+    <div className="d-flex flex-column align-items-center mt-5 ">
+      <SignIn />
+      <Link to="/" className="btn btn-secondary mt-3">← Back to Home!!!!!!</Link>
+    </div>
+  );
+};
+
 const ProtectedGameDetail = () => {
   const { isSignedIn } = useUser();
 
   if (!isSignedIn) {
-    return <RedirectToSignIn />;
+    return < SignInPage/>;
   }
 
   return <GameDetail />;
@@ -160,35 +159,43 @@ const AppContent = () => {
 
     return pages;
   };
-
+  const { signOut } = useClerk();
  return (
    <>
       <Navbar bg="dark" variant="dark" expand="lg" className="px-3">
-        <Navbar.Brand as={Link} to="/">Game Library</Navbar.Brand>
+      <Navbar.Brand as={Link} to="/">Game Library</Navbar.Brand>
+
+      <Navbar.Toggle aria-controls="navbarNav" />
+      <Navbar.Collapse id="navbarNav" className="justify-content-end">
         
-        <Navbar.Toggle aria-controls="navbarNav" />
-        <Navbar.Collapse id="navbarNav" className="justify-content-end">
-          
-          {/* Search Form */}
-          <Form className="d-flex me-3" onSubmit={handleSearchSubmit}>
-            <FormControl
-              type="search"
-              placeholder="Search Games"
-              className="me-2"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-            <Button variant="outline-light" type="submit">Search</Button>
-          </Form>
+        {/* Search Form */}
+        <Form className="d-flex me-3" onSubmit={handleSearchSubmit}>
+          <FormControl
+            type="search"
+            placeholder="Search Games"
+            className="me-2"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+          <Button variant="outline-light" type="submit">Search</Button>
+        </Form>
 
-          {/* Auth Links */}
-          <div>
-            <Link to="/sign-in" className="btn btn-light me-2">Sign In</Link>
-            <Link to="/sign-up" className="btn btn-outline-light">Sign Up</Link>
-          </div>
+        {/* Auth Links */}
+        <SignedOut>
+          <Link to="/sign-in" className="btn btn-light me-2">Sign In</Link>
+          <Link to="/sign-up" className="btn btn-outline-light">Sign Up</Link>
+        </SignedOut>
 
-        </Navbar.Collapse>
-      </Navbar>
+        {/* User Profile & Logout */}
+        <SignedIn>
+          <UserButton />
+          <Button variant="outline-danger" className="ms-2" onClick={() => signOut()}>
+            Logout
+          </Button>
+        </SignedIn>
+
+      </Navbar.Collapse>
+    </Navbar>
 
 
       <Container fluid className="mt-3">                      
@@ -263,17 +270,25 @@ const AppContent = () => {
   );
 };
 
+const SignoutPage = () => {
+  return (
+    <div className="d-flex flex-column align-items-center mt-5 ">
+      <SignUp />
+      <Link to="/" className="btn btn-secondary mt-3">← Back to Home!!!!!!</Link>
+    </div>
+  );
+};
+
+
 const App = () => {
   return (
     <ClerkProvider publishableKey={clerkFrontendApi}>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* <Route path="/library" element={<Library />} /> */}
-          {/* <Route path="/library/:id" element={<GameDetail />} /> */}
           <Route path="/library/:id" element={<ProtectedGameDetail />} />
-          <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
-          <Route path="/sign-up/*" element={<SignUp routing="path" path="/sign-up" />} />
+          <Route path="/sign-in/*" element={<SignInPage />} />
+          <Route path="/sign-up/*" element={<SignoutPage/>} />
         </Routes>
       </Router>
     </ClerkProvider>
