@@ -76,16 +76,6 @@ const SidebarFilters = ({ setCategory, setTag }) => {
 const Home = () => {
   return <AppContent />;
 };
-
-const SignInPage = () => {
-  return (
-    <div className="d-flex flex-column align-items-center mt-5 ">
-      <SignIn />
-      <Link to="/" className="btn btn-secondary mt-3">← Back to Home!!!!!!</Link>
-    </div>
-  );
-};
-
 const ProtectedGameDetail = () => {
   const { isSignedIn } = useUser();
 
@@ -274,6 +264,16 @@ const SignoutPage = () => {
   return (
     <div className="d-flex flex-column align-items-center mt-5 ">
       <SignUp />
+      <Link to="/" className="btn btn-secondary mt-3">← Back to Home!!!!!!</Link>
+    </div>
+  );
+};
+
+
+const SignInPage = () => {
+  return (
+    <div className="d-flex flex-column align-items-center mt-5 ">
+      <SignIn />
       <Link to="/" className="btn btn-secondary mt-3">← Back to Home!!!!!!</Link>
     </div>
   );
