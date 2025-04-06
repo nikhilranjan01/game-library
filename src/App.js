@@ -135,8 +135,8 @@ const AppContent = () => {
   };
 
   const generatePaginationItems = () => {
-    const pageStart = Math.floor((currentPage - 1) / 20) * 20 + 1;
-    const pageEnd = Math.min(pageStart + 24, totalPages);
+    const pageStart = Math.floor((currentPage - 1) / 20) * 3 + 1;
+    const pageEnd = Math.min(pageStart + 4, totalPages);
 
     let pages = [];
     for (let i = pageStart; i <= pageEnd; i++) {
@@ -152,42 +152,63 @@ const AppContent = () => {
   const { signOut } = useClerk();
  return (
    <>
-      <Navbar bg="dark" variant="dark" expand="lg" className="px-3">
-      <Navbar.Brand as={Link} to="/">Game Library</Navbar.Brand>
+         <Navbar bg="dark" variant="dark" expand="lg" className="px-3 py-2 shadow-sm">
+      <Navbar.Brand as={Link} to="/" className="fw-bold text-warning">
+        🎮 Game Library
+      </Navbar.Brand>
 
       <Navbar.Toggle aria-controls="navbarNav" />
-      <Navbar.Collapse id="navbarNav" className="justify-content-end">
-        
+      <Navbar.Collapse id="navbarNav" className="justify-content-end align-items-center">
+
         {/* Search Form */}
-        <Form className="d-flex me-3" onSubmit={handleSearchSubmit}>
+        <Form
+          className="d-flex flex-column flex-lg-row align-items-stretch gap-2 me-lg-3 my-3 my-lg-0"
+          onSubmit={handleSearchSubmit}
+        >
           <FormControl
             type="search"
-            placeholder="Search Games"
-            className="me-2"
+            placeholder="Search games..."
+            className="rounded-pill px-3 shadow-sm border-0 w-100 w-lg-50"
             value={searchQuery}
             onChange={handleSearchChange}
+            style={{ maxWidth: "300px" }}
           />
-          <Button variant="outline-light" type="submit">Search</Button>
+          <Button
+            variant="warning"
+            type="submit"
+            className="rounded-pill shadow-sm px-4 fw-semibold"
+          >
+            🔍 Search
+          </Button>
         </Form>
 
-        {/* Auth Links */}
+        {/* Auth Buttons */}
         <SignedOut>
-          <Link to="/sign-in" className="btn btn-light me-2">Sign In</Link>
-          <Link to="/sign-up" className="btn btn-outline-light">Sign Up</Link>
+          <div className="d-flex flex-column flex-lg-row  gap-2">
+            <Link to="/sign-in" className="btn btn-light rounded-pill py-3 fw-semibold">
+              Sign In
+            </Link>
+            <Link to="/sign-up" className="btn btn-outline-light py-3 rounded-pill fw-semibold">
+              Sign Up
+            </Link>
+          </div>
         </SignedOut>
 
-        {/* User Profile & Logout */}
+        {/* Logged-in User */}
         <SignedIn>
-          <UserButton />
-          <Button variant="outline-danger" className="ms-2" onClick={() => signOut()}>
-            Logout
-          </Button>
+          <div className="d-flex align-items-center gap-3">
+            <UserButton />
+            <Button
+              variant="outline-danger"
+              className="rounded-pill fw-semibold px-3"
+              onClick={() => signOut()}
+            >
+              Logout
+            </Button>
+          </div>
         </SignedIn>
-
       </Navbar.Collapse>
     </Navbar>
-
-
       <Container fluid className="mt-3">                      
         <Row>
           {/* Sidebar */}
