@@ -153,7 +153,7 @@ const AppContent = () => {
  return (
    <>
          <Navbar bg="dark" variant="dark" expand="lg" className="px-3 py-2 shadow-sm">
-      <Navbar.Brand as={Link} to="/" className="fw-bold text-warning">
+      <Navbar.Brand as={Link} to="/" className="fw-bold text-warning fs-3">
         🎮 Game Library
       </Navbar.Brand>
 
@@ -168,15 +168,15 @@ const AppContent = () => {
           <FormControl
             type="search"
             placeholder="Search games..."
-            className="rounded-pill px-3 shadow-sm border-0 w-100 w-lg-50"
+            className="rounded-pill px-3 shadow-sm border-0 w-100 w-lg-50  py-3 py-lg-1"
             value={searchQuery}
             onChange={handleSearchChange}
-            style={{ maxWidth: "300px" }}
+           
           />
           <Button
             variant="warning"
             type="submit"
-            className="rounded-pill shadow-sm px-4 fw-semibold"
+            className="rounded-pill shadow-sm fw-semibold py-3 py-lg-1"
           >
             🔍 Search
           </Button>
@@ -188,7 +188,7 @@ const AppContent = () => {
             <Link to="/sign-in" className="btn btn-light rounded-pill py-3 fw-semibold">
               Sign In
             </Link>
-            <Link to="/sign-up" className="btn btn-outline-light py-3 rounded-pill fw-semibold">
+            <Link to="/sign-up" className="btn btn-outline-light  py-3 rounded-pill fw-semibold">
               Sign Up
             </Link>
           </div>
@@ -217,8 +217,8 @@ const AppContent = () => {
           </Col>
 
           {/* Game Cards Section */}
-          <Col md={9}>
-            <div className="d-flex flex-column">
+          <Col md={9} >
+            <div className="d-flex flex-column ">
               <Row className="g-4">
                 {loading ? (
                   <div className="d-flex justify-content-center align-items-center w-100" style={{ height: "50vh" }}>
